@@ -1,94 +1,100 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
-typedef vector<ll> vi;
-#define PB push_back
-#define MP make_pair
-#define rep(i, a, b) for (ll i = a; i <= b; i++)
-void print(vi v)
+
+int m, n;
+vector<int> t, y, z, ans;
+
+bool good(int time)
 {
-    for (auto f : v)
-        cout << f << " ";
-}
-ll m, n;
-bool g(ll x, ll v[][3])
-{
-    ll f = 0;
-    rep(i, 0, n - 1)
+    int res = 0;
+    for (int i = 0; i < n; i++)
     {
-        ll t = v[i][0];
-        ll z = v[i][1];
-        ll y = v[i][2];
-        ll p = (t * z) + y;
-        f += ((x / p) * z + min(z, ((x % p) / t)));
+        int ballon = time / (t[i] * z[i] + y[i]);
+        int rem = time - ballon * (t[i] * z[i] + y[i]);
+        ballon *= z[i];
+        if (rem >= t[i])
+        {
+            if (rem / t[i] > z[i])
+            {
+                ballon += z[i];
+            }
+            else
+                ballon += (rem / t[i]);
+        }
+        ans[i] = ballon;
+        res += ans[i];
     }
-    if (f >= m)
-    {
-        return 1;
-    }
-    else
-        return 0;
-}
-vector<ll> good(ll x, ll v[][3])
-{
-    vector<ll> v1(n, 0);
-    ll f = 0;
-    // ll f = 0;
-    rep(i, 0, n - 1)
-    {
-        if (f >= m)
-            break;
-        ll t = v[i][0];
-        ll z = v[i][1];
-        ll y = v[i][2];
-        ll g = 0;
-        ll p = t * z + y;
-        g = (x / p) * z + min(z, ((x % p) / t));
-        
-        v1[i] = g;
-    }
-    return v1;
+    return res >= m;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    // ll n;
-    // ll n, x, y;
     cin >> m >> n;
-    // v.resize(n);
-
-    ll v[n][3];
-    rep(i, 0, n - 1)
+    t.resize(n);
+    y.resize(n);
+    z.resize(n), ans.resize(n);
+    for (int i = 0; i < n; i++)
     {
-        ll f, g, h;
-        cin >> f >> g >> h;
-        v[i][0] = f;
-        v[i][1] = g;
-        v[i][2] = h;
+        cin >> t[i] >> z[i] >> y[i];
     }
-    ll r = 3000001;
-    ll ans = 0;
-    ll l = 0;
-    vector<ll> f;
-    while (r >= l)
+    if (m == 0)
     {
-        ll mid = r + l;
-        mid /= 2;
-        // vector<ll> p = good(mid);
-        if (g(mid, v))
+        cout << 0 << endl;
+        for (int i = 0; i < n; i++)
         {
-            ans = mid;
-            r = mid - 1;
+            cout << "0 ";
+        }
+        return 0;
+    }
+    int l = 0, r = 1e7, count = 0;
+    while (l + 1 < r)
+    {
+        count++;
+        int mid = (l + r) / 2;
+        if (good(mid))
+        {
+            r = mid;
         }
         else
-            l = mid + 1;
+        {
+            l = mid;
+        }
     }
-    f = good(ans, v);
-    cout << ans << "\n";
-    for (auto g : f)
+    cout << r << "\n";
+    int time = r;
+    for (int i = 0; i < n; i++)
     {
-        cout << g << " ";
+        int ballon = time / (t[i] * z[i] + y[i]);
+        int rem = time - ballon * (t[i] * z[i] + y[i]);
+        ballon *= z[i];
+        if (rem >= t[i])
+        {
+            if (rem / t[i] > z[i])
+            {
+                ballon += z[i];
+            }
+            else
+                ballon += (rem / t[i]);
+        }
+        ans[i] = ballon;
     }
+    int blown = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (blown + ans[i] > m)
+        {
+            if (m > 0)
+            {
+                cout << m - blown << " ";
+                m = 0;
+            }
+            else
+                cout << "0 ";
+        }
+        else
+            cout << ans[i] << " ";
+        blown += ans[i];
+    }
+    cout << "\n";
+    return 0;
 }
